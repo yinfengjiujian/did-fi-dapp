@@ -45,6 +45,22 @@
           </NuxtLink>
         </div>
 
+        <!-- Search -->
+        <div class="hidden lg:block relative">
+          <div class="relative">
+            <input 
+              v-model="searchQuery"
+              @keyup.enter="handleSearch"
+              type="text" 
+              placeholder="搜索用户地址..."
+              class="w-64 bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+            />
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
         <!-- Right Side -->
         <div class="flex items-center gap-4">
           <!-- Theme Toggle (Future) -->
@@ -64,7 +80,7 @@
           </button> -->
 
           <!-- Wallet Connector -->
-          <WalletConnector />
+          <WalletConnector mode="navbar" />
 
           <!-- Mobile Menu Button -->
           <button
@@ -92,7 +108,7 @@
       >
         <div
           v-if="mobileMenuOpen"
-          class="md:hidden absolute top-16 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-b border-white/10"
+          class="md:hidden absolute top-16 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-b border-white/10 z-45"
         >
           <div class="container mx-auto px-6 py-4">
             <div class="space-y-2">
@@ -148,7 +164,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { ethers } from 'ethers'
 
 // Store
 const walletStore = useWalletStore()
@@ -156,6 +173,7 @@ const walletStore = useWalletStore()
 // State
 const mobileMenuOpen = ref(false)
 const isLoading = ref(false)
+const searchQuery = ref('')
 
 // Navigation items - 针对 DID-Fi DApp 特点设计
 const navItems = [
@@ -165,6 +183,22 @@ const navItems = [
   { name: '打赏广场', path: '/tips', icon: 'gift' },
   { name: '我的空间', path: '/dashboard', icon: 'dashboard' }
 ]
+
+// Search functionality
+const handleSearch = () => {
+  const query = searchQuery.value.trim()
+  if (!query) return
+  
+  // 检查是否是有效的以太坊地址
+  if (ethers.isAddress(query)) {
+    // 直接跳转到用户主页
+    navigateTo(`/user/${query}`)
+    searchQuery.value = ''
+  } else {
+    // 可以在这里添加其他搜索逻辑，比如按昵称搜索
+    alert('请输入有效的钱包地址 (0x...)')
+  }
+}
 
 // Watch route changes to close mobile menu
 watch(() => useRoute().path, () => {

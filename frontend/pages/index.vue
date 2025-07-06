@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
     <!-- Hero Section -->
-    <section class="relative pt-20 pb-32 overflow-hidden">
+    <section class="relative pt-32 pb-32 overflow-hidden">
       <div class="absolute inset-0 bg-black opacity-20"></div>
       <div class="relative container mx-auto px-6 text-center">
         <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
@@ -161,6 +161,63 @@
       </div>
     </section>
 
+    <!-- Discover Users Section -->
+    <section class="py-20">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-white mb-4">发现优秀创作者</h2>
+        <p class="text-gray-300 text-lg">探索社区中活跃的用户和创作者</p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div 
+          v-for="user in featuredUsers" 
+          :key="user.address"
+          class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105"
+        >
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span class="text-white text-lg font-bold">{{ getInitials(user.address) }}</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">{{ user.nickname }}</h3>
+            <p class="text-gray-400 text-sm mb-3">{{ formatAddress(user.address) }}</p>
+            
+            <div class="flex justify-center gap-4 mb-4 text-sm">
+              <div class="text-center">
+                <div class="text-green-400 font-bold">{{ user.reputation > 0 ? '+' : '' }}{{ user.reputation }}</div>
+                <div class="text-gray-500">声誉</div>
+              </div>
+              <div class="text-center">
+                <div class="text-yellow-400 font-bold">{{ user.totalReceived }}</div>
+                <div class="text-gray-500">打赏</div>
+              </div>
+            </div>
+            
+            <NuxtLink
+              :to="`/user/${user.address}`"
+              class="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-cyan-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              查看主页
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-12">
+        <NuxtLink
+          to="/reputation"
+          class="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+        >
+          查看完整排行榜
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </NuxtLink>
+      </div>
+    </section>
+
     <!-- Demo Section -->
     <section class="py-20">
       <div class="text-center mb-12">
@@ -219,6 +276,58 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
+// 推荐用户数据（实际应从合约或API获取）
+const featuredUsers = ref([
+  {
+    address: '0x1234567890123456789012345678901234567890',
+    nickname: 'Solidity开发者',
+    reputation: 25,
+    totalReceived: '156.5'
+  },
+  {
+    address: '0x9876543210987654321098765432109876543210', 
+    nickname: '智能合约审计师',
+    reputation: 18,
+    totalReceived: '89.2'
+  },
+  {
+    address: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+    nickname: 'DeFi研究员',
+    reputation: 31,
+    totalReceived: '203.8'
+  },
+  {
+    address: '0x1111111111111111111111111111111111111111',
+    nickname: 'Web3教程创作者',
+    reputation: 42,
+    totalReceived: '312.7'
+  },
+  {
+    address: '0x2222222222222222222222222222222222222222',
+    nickname: 'NFT艺术家',
+    reputation: 15,
+    totalReceived: '67.9'
+  },
+  {
+    address: '0x3333333333333333333333333333333333333333',
+    nickname: '区块链分析师',
+    reputation: 38,
+    totalReceived: '245.1'
+  }
+])
+
+// 工具函数
+const formatAddress = (address) => {
+  if (!address) return ''
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
+}
+
+const getInitials = (address) => {
+  return address.slice(2, 4).toUpperCase()
+}
+
 // Meta tags
 useHead({
   title: 'DID-Fi DApp - 去中心化身份 · 声誉系统 · 打赏经济',

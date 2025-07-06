@@ -32,51 +32,68 @@
     </div>
 
     <!-- 已连接状态 -->
-    <div v-else class="flex items-center gap-3">
-      <!-- 网络指示器 -->
-      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
-        <div 
-          class="w-3 h-3 rounded-full"
-          :class="getNetworkColor(walletStore.chainId)"
-        ></div>
-        <span class="text-sm text-gray-300">
-          {{ getNetworkName(walletStore.chainId) }}
-        </span>
-      </div>
+    <div v-else class="relative">
+      <div class="flex items-center gap-3">
+        <!-- 网络指示器（导航栏模式才显示） -->
+        <div v-if="mode === 'navbar'" class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
+          <div 
+            class="w-3 h-3 rounded-full"
+            :class="getNetworkColor(walletStore.chainId)"
+          ></div>
+          <span class="text-sm text-gray-300">
+            {{ getNetworkName(walletStore.chainId) }}
+          </span>
+        </div>
 
-      <!-- 余额显示 -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
-        <span class="text-sm text-gray-300">
-          {{ walletStore.formatBalance(walletStore.balance) }} ETH
-        </span>
-      </div>
+        <!-- 余额显示（导航栏模式才显示） -->
+        <div v-if="mode === 'navbar'" class="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
+          <span class="text-sm text-gray-300">
+            {{ walletStore.formatBalance(walletStore.balance) }} ETH
+          </span>
+        </div>
 
-      <!-- 地址和菜单 -->
-      <div class="relative">
+        <!-- 用户菜单按钮 -->
         <button
           @click="showDropdown = !showDropdown"
-          class="bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2"
+          class="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105"
         >
-          <div class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
-          {{ walletStore.formatAddress(walletStore.address || '') }}
+          <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <span class="hidden sm:inline">{{ walletStore.formatAddress(walletStore.address) }}</span>
           <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': showDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
+      </div>
 
-        <!-- 下拉菜单 -->
-        <transition
-          enter-active-class="transition ease-out duration-200"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-150"
-          leave-from-class="opacity-100 scale-100"
-          leave-to-class="opacity-0 scale-95"
+      <!-- 遮罩层（模态框模式） -->
+      <div 
+        v-if="showDropdown && mode === 'modal'"
+        @click="showDropdown = false"
+        class="fixed inset-0 z-40 bg-black/50"
+      ></div>
+
+      <!-- 钱包菜单 -->
+      <transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div
+          v-if="showDropdown"
+          :class="[
+            'w-80 bg-gray-800 rounded-xl shadow-2xl border-2 border-cyan-400/50 backdrop-blur-md',
+            mode === 'modal' 
+              ? 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50' 
+              : 'absolute right-0 top-full mt-2 z-50'
+          ]"
         >
-          <div
-            v-if="showDropdown"
-            class="absolute right-0 mt-2 w-64 bg-gray-900 rounded-xl shadow-xl border border-gray-700 z-50"
-          >
             <!-- 账户信息 -->
             <div class="p-4 border-b border-gray-700">
               <div class="flex items-center gap-3 mb-3">
@@ -96,11 +113,15 @@
                   <span class="text-gray-400">地址:</span>
                   <button 
                     @click="copyAddress"
-                    class="text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                    class="flex items-center gap-1 transition-colors duration-200"
+                    :class="copied ? 'text-green-400' : 'text-blue-400 hover:text-blue-300'"
                   >
                     {{ walletStore.formatAddress(walletStore.address) }}
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-if="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                   </button>
                 </div>
@@ -171,7 +192,7 @@
     >
       <div
         v-if="error"
-        class="fixed top-4 right-4 bg-red-500/90 text-white px-6 py-4 rounded-xl shadow-lg border border-red-400 z-50 max-w-sm"
+        class="fixed top-4 right-4 bg-red-500/90 text-white px-6 py-4 rounded-xl shadow-lg border border-red-400 z-[9999] max-w-sm"
       >
         <div class="flex items-start gap-3">
           <svg class="w-6 h-6 text-red-200 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +225,7 @@
     >
       <div
         v-if="success"
-        class="fixed top-4 right-4 bg-green-500/90 text-white px-6 py-4 rounded-xl shadow-lg border border-green-400 z-50"
+        class="fixed top-4 right-4 bg-green-500/90 text-white px-6 py-4 rounded-xl shadow-lg border border-green-400 z-[9999]"
       >
         <div class="flex items-center gap-3">
           <svg class="w-6 h-6 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +243,6 @@
         </div>
       </div>
     </transition>
-    </div>
   </ClientOnly>
 </template>
 
@@ -231,6 +251,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 // Props
 const props = defineProps({
+  mode: {
+    type: String,
+    default: 'modal', // 'modal' for homepage, 'navbar' for navigation
+    validator: (value) => ['modal', 'navbar'].includes(value)
+  },
   size: {
     type: String,
     default: 'default', // 'small', 'default', 'large'
@@ -246,6 +271,7 @@ const connecting = ref(false)
 const showDropdown = ref(false)
 const error = ref('')
 const success = ref('')
+const copied = ref(false)
 
 // Methods
 const handleConnect = async () => {
@@ -275,9 +301,13 @@ const handleDisconnect = () => {
 
 const copyAddress = async () => {
   try {
-    await navigator.clipboard.writeText(walletStore.address)
+    await navigator.clipboard.writeText(walletStore.address.value)
+    copied.value = true
     success.value = '地址已复制到剪贴板'
-    setTimeout(() => success.value = '', 2000)
+    setTimeout(() => {
+      success.value = ''
+      copied.value = false
+    }, 2000)
   } catch (err) {
     error.value = '复制失败'
     setTimeout(() => error.value = '', 3000)
