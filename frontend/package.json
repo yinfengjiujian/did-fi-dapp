@@ -1,0 +1,37 @@
+{
+  "name": "did-fi-dapp",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "tw:init": "tailwindcss init -p",
+    "start": "node .output/server/index.mjs",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "type-check": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@pinia/nuxt": "^0.5.1",
+    "ethers": "^6.15.0",
+    "nuxt": "^3.17.6",
+    "pinia": "^2.1.7",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.17.5",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.50.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "3.3.3",
+    "typescript": "^5.2.2",
+    "vue-tsc": "^2.0.0"
+  }
+}
