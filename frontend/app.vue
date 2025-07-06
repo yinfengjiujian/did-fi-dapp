@@ -3,6 +3,9 @@
     <!-- Global Notifications -->
     <NuxtRouteAnnouncer />
     
+    <!-- Navigation -->
+    <TheNavbar />
+    
     <!-- Main Content -->
     <main>
       <NuxtPage />

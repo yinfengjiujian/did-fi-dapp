@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
-    <TheNavbar />
     
     <div class="container mx-auto px-6 py-8 pt-24">
       <!-- Header -->
